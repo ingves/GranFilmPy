@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Run the simulation and get the results &mdash; GranFilm 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="GranFilm 1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Create and configure your simulation" href="page1.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GranFilm
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="page0.html">Import GranFilm on your python IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="page1.html">Create and configure your simulation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run the simulation and get the results</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GranFilm</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Run the simulation and get the results</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/page2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="run-the-simulation-and-get-the-results">
+<h1>Run the simulation and get the results<a class="headerlink" href="#run-the-simulation-and-get-the-results" title="Permalink to this headline">¶</a></h1>
+<p>Once you&#8217;ve configure the parameters of the simulation, you can run it with <code class="docutils literal"><span class="pre">gf()</span></code></p>
+<p>Then <code class="docutils literal"><span class="pre">gf</span></code> works like a dictionary and each quantity provided by GranFilm is stored either in:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">gf[&quot;name_of_the_quantity&quot;]</span></code></li>
+<li>or can be get through the function <code class="docutils literal"><span class="pre">gf[&quot;name_of_the_quantity&quot;](parameters)</span></code>.</li>
+</ul>
+</div></blockquote>
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;energy&quot;]</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the energies (in eV) on which optical properties are calculated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;wavelength&quot;]</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">same for wavelength (in nm)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;epsilon&quot;](material)</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The complex dielectric function of a material used in the simulation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>material</strong> (<em>string</em>) &#8211; the material for which you want the dielectric function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Fresnel&quot;](ref_trans,pol,geometry=&quot;Island&quot;,fmt=&quot;Complex&quot;,deg=&quot;True&quot;)</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The fresnel coefficient (ratio of E-fields) for reflection or transmission for a given polarisation</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ref_trans</strong> (<em>string</em>) &#8211; &#8216;r&#8217; for reflection, &#8216;t&#8217; for transmission</li>
+<li><strong>pol</strong> (<em>string</em>) &#8211; &#8216;p&#8217; for a polarisation in the incident plan, &#8216;s&#8217; for a perpendicular one, &#8216;ps&#8217; for unpolarised light</li>
+<li><strong>geometry</strong> (<em>string</em>) &#8211; &#8216;Island&#8217; to get the fresnel amplitude for your configuration (islands on substrate), &#8216;Flat&#8217; to get it for a flat substrate</li>
+<li><strong>fmt</strong> (<em>string</em>) &#8211; The format of the fresnel coefficient: &#8216;Complex&#8217;, &#8216;Real&#8217;,&#8217;Imag&#8217;,&#8217;Amplitude&#8217; or &#8216;Phase&#8217;</li>
+<li><strong>deg</strong> (<em>string</em>) &#8211; deg = &#8216;True&#8217; to use degrees for the &#8216;Phase&#8217; format, &#8216;False&#8217; for radians</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Intensity_coeff&quot;](ref_trans,pol,geometry=&quot;Island&quot;)</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The intensity coefficient (ratio of intensities) for reflection or transmission for a given polarisation</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ref_trans</strong> (<em>string</em>) &#8211; &#8216;R&#8217; for reflection, &#8216;T&#8217; for transmission</li>
+<li><strong>pol</strong> (<em>string</em>) &#8211; &#8216;p&#8217; for a polarisation in the incident plan, &#8216;s&#8217; for a perpendicular one, &#8216;ps&#8217; for unpolarised light</li>
+<li><strong>geometry</strong> (<em>string</em>) &#8211; &#8216;Island&#8217; to get the intensity coefficient for your configuration (islands on substrate), &#8216;Flat&#8217; to get it for a flat substrate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Diff_intensity_coeff&quot;](ref_trans,pol)</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The differential intensity coefficient = (X_islands - X_flat) / X_flat for reflection or transmission for a given polarisation</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ref_trans</strong> (<em>string</em>) &#8211; &#8216;R&#8217; for reflection, &#8216;T&#8217; for transmission</li>
+<li><strong>pol</strong> (<em>string</em>) &#8211; &#8216;p&#8217; for a polarisation in the incident plan, &#8216;s&#8217; for a perpendicular one, &#8216;ps&#8217; for unpolarised light</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Potential&quot;](output='plot',fmt=&quot;Real&quot;,deg='True',equipotential=False)</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The scalar potential as defined in the &#8220;points_file&#8221; parameter</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output</strong> &#8211; &#8216;plot&#8217; to plot the potential, &#8216;potential_map&#8217; for the 2D matrix of the potential around the particle,
+&#8216;error&#8217; to get the average discontuinity error of the potential at the interfaces and &#8216;data&#8217; for the raw
+potential matrix where each line is [x,y,z,medium_number,Potential_real,Potential_Imag] <br /> <br />
+<code class="docutils literal"><span class="pre">Note:</span> <span class="pre">'plot'</span> <span class="pre">and</span> <span class="pre">'potential_map'</span> <span class="pre">work</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">&quot;classic&quot;</span> <span class="pre">points_file</span></code>
+<code class="docutils literal"><span class="pre">'error'</span> <span class="pre">works</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">&quot;surface&quot;</span> <span class="pre">points_file</span></code>
+<code class="docutils literal"><span class="pre">'data'</span> <span class="pre">works</span> <span class="pre">for</span> <span class="pre">any</span> <span class="pre">points_file</span> <span class="pre">(except</span> <span class="pre">'None')</span></code> <br /> <br /></li>
+<li><strong>fmt</strong> (<em>string</em>) &#8211; The format of the output: &#8216;Complex&#8217;, &#8216;Real&#8217;,&#8217;Imag&#8217;,&#8217;Amplitude&#8217; or &#8216;Phase&#8217;</li>
+<li><strong>deg</strong> (<em>string</em>) &#8211; deg = &#8216;True&#8217; to use degrees for the &#8216;Phase&#8217; format, &#8216;False&#8217; for radians</li>
+<li><strong>equipotential</strong> (<em>boolean</em>) &#8211; True -&gt; add equipotentials to the potential plot</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Polarizabilities&quot;](orientation=&quot;None&quot;, type='Dipole', fmt='Complex', deg='True')</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The polarizability of one particle supported by the substrate</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>orientation</strong> (<em>string</em>) &#8211; &#8216;Parallel&#8217; / &#8216;Perpendicular&#8217; for the component of the polarizability parallel / normal to the interface</li>
+<li><strong>type</strong> (<em>string</em>) &#8211; &#8216;Dipole&#8217; / &#8216;Quadrupole&#8217; for the dipolar / quadrupolar polarizability</li>
+<li><strong>fmt</strong> (<em>string</em>) &#8211; The format of the output: &#8216;Complex&#8217;, &#8216;Real&#8217;,&#8217;Imag&#8217;,&#8217;Amplitude&#8217; or &#8216;Phase&#8217;</li>
+<li><strong>deg</strong> (<em>string</em>) &#8211; deg = &#8216;True&#8217; to use degrees for the &#8216;Phase&#8217; format, &#8216;False&#8217; for radians</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">gf[&quot;Susceptibilities&quot;](type='Dipole', fmt='Complex', deg='True')</code></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The surface susceptibilities of the system</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type</strong> (<em>string</em>) &#8211; &#8216;gamma&#8217;,&#8217;beta&#8217;,&#8217;delta&#8217; or &#8216;tau&#8217; for each susceptibility</li>
+<li><strong>fmt</strong> (<em>string</em>) &#8211; The format of the output: &#8216;Complex&#8217;, &#8216;Real&#8217;,&#8217;Imag&#8217;,&#8217;Amplitude&#8217; or &#8216;Phase&#8217;</li>
+<li><strong>deg</strong> (<em>string</em>) &#8211; deg = &#8216;True&#8217; to use degrees for the &#8216;Phase&#8217; format, &#8216;False&#8217; for radians</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="page1.html" class="btn btn-neutral" title="Create and configure your simulation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Alexis CVETKOV-ILIEV.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

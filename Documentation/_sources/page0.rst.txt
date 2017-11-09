@@ -1,0 +1,19 @@
+**********************************
+Import GranFilm on your python IDE 
+********************************** 
+
+The GranFilm package contains several elements:
+
+ * the **GranFilm executables** compiled from the Fortran90 source code for Linux and Windows
+ * the **SOPRA Database** with refractive index data for many materials
+ * the **Python Interface** with the .py files which constitutes the python inferface
+ * the **Init_GranFilm.py** file which imports the functionnalities of the python \ 
+   interface and allows you to start playing on GranFilm
+
+Here are the steps to import the python interface:
+
+ * If it's the first time that you use GranFilm on your computer, just make sure that there is no file named "input_file" in the GranFilm package
+ * Open your IDE (Spyder, IPython...)
+ * Run *Init_GranFilm.py* (using F5 on Spyder or ``%run /path/to/Init_GranFilm.py`` on IPython)
+
+Then you have to initialize a new simulation and set its parameters.

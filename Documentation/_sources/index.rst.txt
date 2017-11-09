@@ -1,0 +1,38 @@
+.. Documentation GranFilm documentation master file, created by
+   sphinx-quickstart on Fri Jul  7 15:03:50 2017.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+
+Introduction to GranFilm
+==================================================
+
+GranFilm is a Fortran90 software developed by Ingve Simonsen and Remi Lazzari.
+It calculates the optical properties of a substrate which support a 2D lattice of nanoparticles.
+
+GranFilm allows you to play on:
+
+  * the geometry of the particles (radius,truncated / coated / spheroidal particles)
+  * the structure of the lattice
+  * the materials used for the ambient medium, the substrate and the particles
+
+.. image:: _static/granfilm_intro.png 
+   :align: center
+   :scale: 80%
+
+*Figure 1: Kind of system modeled by GranFilm*
+
+
+GranFilm mainly returns:
+
+  * the reflection, transmission and absorption coefficients
+  * the scalar potential
+  * the polarizability of one particle of the lattice
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Table of contents:
+
+   page0
+   page1
+   page2

@@ -1,0 +1,110 @@
+.. Definition des substitutions utilisées dans la doc python
+
+.. |br| raw:: html
+
+       <br />
+
+**************************************
+Run the simulation and get the results 
+************************************** 
+
+Once you've configure the parameters of the simulation, you can run it with ``gf()``
+
+Then ``gf`` works like a dictionary and each quantity provided by GranFilm is stored either in:
+
+  * ``gf["name_of_the_quantity"]``
+  * or can be get through the function ``gf["name_of_the_quantity"](parameters)``.
+
+.. py:function:: gf["energy"]
+
+    :returns: the energies (in eV) on which optical properties are calculated
+    :rtype: array
+
+.. py:function:: gf["wavelength"]
+
+    :returns: same for wavelength (in nm)
+    :rtype: array
+  
+.. py:function:: gf["epsilon"](material)
+
+    :returns: The complex dielectric function of a material used in the simulation
+    :rtype: array
+    :param material: the material for which you want the dielectric function
+    :type material: string
+
+.. py:function:: gf["Fresnel"](ref_trans,pol,geometry="Island",fmt="Complex",deg="True")
+
+    :returns: The fresnel coefficient (ratio of E-fields) for reflection or transmission for a given polarisation
+    :rtype: array
+    :param ref_trans: 'r' for reflection, 't' for transmission
+    :type ref_trans: string
+    :param pol: 'p' for a polarisation in the incident plan, 's' for a perpendicular one, 'ps' for unpolarised light
+    :type pol: string
+    :param geometry: 'Island' to get the fresnel amplitude for your configuration (islands on substrate), 'Flat' to get it for a flat substrate
+    :type geometry: string
+    :param fmt: The format of the fresnel coefficient: 'Complex', 'Real','Imag','Amplitude' or 'Phase'
+    :type fmt: string
+    :param deg: deg = 'True' to use degrees for the 'Phase' format, 'False' for radians
+    :type deg: string
+
+.. py:function:: gf["Intensity_coeff"](ref_trans,pol,geometry="Island")
+
+    :returns: The intensity coefficient (ratio of intensities) for reflection or transmission for a given polarisation
+    :rtype: array
+    :param ref_trans: 'R' for reflection, 'T' for transmission
+    :type ref_trans: string
+    :param pol: 'p' for a polarisation in the incident plan, 's' for a perpendicular one, 'ps' for unpolarised light
+    :type pol: string
+    :param geometry: 'Island' to get the intensity coefficient for your configuration (islands on substrate), 'Flat' to get it for a flat substrate
+    :type geometry: string
+
+.. py:function:: gf["Diff_intensity_coeff"](ref_trans,pol)
+
+    :returns: The differential intensity coefficient = (X_islands - X_flat) / X_flat for reflection or transmission for a given polarisation
+    :rtype: array
+    :param ref_trans: 'R' for reflection, 'T' for transmission
+    :type ref_trans: string
+    :param pol: 'p' for a polarisation in the incident plan, 's' for a perpendicular one, 'ps' for unpolarised light
+    :type pol: string
+
+.. py:function:: gf["Potential"](output='plot',fmt="Real",deg='True',equipotential=False)
+
+    :returns: The scalar potential as defined in the "points_file" parameter
+    :param output: 'plot' to plot the potential, 'potential_map' for the 2D matrix of the potential around the particle,
+                   'error' to get the average discontuinity error of the potential at the interfaces and 'data' for the raw
+                   potential matrix where each line is [x,y,z,medium_number,Potential_real,Potential_Imag] |br| |br| 
+                   ``Note: 'plot' and 'potential_map' work for the "classic" points_file``
+                   ``'error' works for the "surface" points_file``
+                   ``'data' works for any points_file (except 'None')`` |br| |br|
+    :type orientation: string
+    :param fmt: The format of the output: 'Complex', 'Real','Imag','Amplitude' or 'Phase'
+    :type fmt: string
+    :param deg: deg = 'True' to use degrees for the 'Phase' format, 'False' for radians
+    :type deg: string
+    :param equipotential: True -> add equipotentials to the potential plot
+    :type equipotential: boolean
+    
+
+.. py:function:: gf["Polarizabilities"](orientation="None", type='Dipole', fmt='Complex', deg='True')
+
+    :returns: The polarizability of one particle supported by the substrate
+    :rtype: array
+    :param orientation: 'Parallel' / 'Perpendicular' for the component of the polarizability parallel / normal to the interface
+    :type orientation: string
+    :param type: 'Dipole' / 'Quadrupole' for the dipolar / quadrupolar polarizability
+    :type type: string
+    :param fmt: The format of the output: 'Complex', 'Real','Imag','Amplitude' or 'Phase'
+    :type fmt: string
+    :param deg: deg = 'True' to use degrees for the 'Phase' format, 'False' for radians
+    :type deg: string
+
+.. py:function:: gf["Susceptibilities"](type='Dipole', fmt='Complex', deg='True')
+
+    :returns: The surface susceptibilities of the system
+    :rtype: array
+    :param type: 'gamma','beta','delta' or 'tau' for each susceptibility
+    :type type: string
+    :param fmt: The format of the output: 'Complex', 'Real','Imag','Amplitude' or 'Phase'
+    :type fmt: string
+    :param deg: deg = 'True' to use degrees for the 'Phase' format, 'False' for radians
+    :type deg: string
