@@ -1,0 +1,5 @@
+13		             ! Plasma frequency times hbar (eV) Mean Palik P394
+0.09475                  ! Inverse relaxation time times hbar (eV) 
+1.33619                  ! Fermi velocity times hbar (eV nm)
+0	                   ! Surface corrections ???
+0			      ! Dependance of plasma frequency with temperature (ev/K) ???
