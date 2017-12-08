@@ -265,15 +265,15 @@ class GranFilm_Results_Suceptibilities:
     
     def __init__(self, data):
                 
-        imu = 1j                         # imaginar unit
+        imu = 1j                         # imaginary unit
         #
         self.energy = data[:,0]
         #
-        self. gamma   = data[:,11]  + imu * data[:,12]
-        self. beta    = data[:,13]  + imu * data[:,14]
+        self.gamma   = data[:,11]  + imu * data[:,12]
+        self.beta    = data[:,13]  + imu * data[:,14]
         #
-        self. delta   = data[:,15]  + imu * data[:,16]
-        self. tau     = data[:,17]  + imu * data[:,18]
+        self.delta   = data[:,15]  + imu * data[:,16]
+        self.tau     = data[:,17]  + imu * data[:,18]
 
 
     def __call__(self, type="None", fmt='Complex', deg='True'):
@@ -283,7 +283,7 @@ class GranFilm_Results_Suceptibilities:
         Options
         -------
         type: string
-            which surface susceptibility to return (delta, bets,gamma or tau)
+            which surface susceptibility to return (gamma, beta, delta or tau)
             Default : None
         fmt : string
            Format of the returned value {'Complex', 'Real', 'Imag', 'Amplitude', 'Phase' }
@@ -294,15 +294,15 @@ class GranFilm_Results_Suceptibilities:
 
         # error checking
         FMT={'Complex', 'Real', 'Imag', 'Amplitude', 'Phase' }
-        assert (type in {'delta','beta', 'gamma', 'tau'}), "ERROR : type=%s is not supported (valid options: 'Dipole','Quadrupole') " % type        
+        assert (type in {'gamma','beta', 'delta', 'tau'}), "ERROR : type=%s is not supported (valid options: 'Dipole','Quadrupole') " % type        
         assert (fmt in FMT), "ERROR : type=%s is not supported " % fmt
 
-        if (type=='delta'):
-            susceptibility = self.delta
+        if (type=='gamma'):
+            susceptibility = self.gamma
         elif (type=='beta'):
             susceptibility = self.beta
-        elif (type=='gamma'):
-            susceptibility = self.gamma
+        elif (type=='delta'):
+            susceptibility = self.delta
         elif (type=='tau'):
             susceptibility = self.tau
 
@@ -337,8 +337,9 @@ class GranFilm_Results_Polarizabilities:
         self.alpha_parallel       = data[:,3]  + imu * data[:,4]
         self.alpha_perpendicular  = data[:,5]  + imu * data[:,6]
         #
-        self.alpha_10_parallel       = data[:,9]   + imu * data[:,10]
-        self.alpha_10_perpendicular  = data[:,11]  + imu * data[:,12]
+        self.alpha_10_parallel       = data[:,7]   + imu * data[:,8]
+        self.alpha_10_perpendicular  = data[:,9]   + imu * data[:,10]
+
 
 
     def __call__(self, orientation="None", type='Dipole', fmt='Complex', deg='True'):
