@@ -17,7 +17,7 @@ operating_system = system()
 
 python_interface = os.path.dirname(os.path.realpath(__file__)).replace('\\','/') # Path to the directory of the .py files constituting the python interface for GranFilm 
 gf_package = os.path.split(python_interface)[0].replace('\\','/') # Path to the GranFilm_Package directory
-GRANFILM_ROOT= os.path.join(gf_package,'GranFilm_'+operating_system).replace('\\','/') # Path to the GranFilm executable
+GRANFILM_ROOT= os.path.join(gf_package,'bin','GranFilm_'+operating_system).replace('\\','/') # Path to the GranFilm executable
 SOPRA_ROOT = os.path.join(gf_package,'SOPRA_DataBase/').replace('\\','/') # Path to the SOPRA_DataBase which contains dielectric functions for numerous materials
 
   
@@ -89,7 +89,7 @@ class GranFilm:
 # --------------- Instance initialisation --------------- #
 
 
-    def __init__(self,granfilm_root=GRANFILM_ROOT,sopra_root=SOPRA_ROOT,radius=8.0,truncation_ratio=0.0,radius_ratios=[1.0],
+    def __init__(self,GRANFILM_ROOT=GRANFILM_ROOT,SOPRA_ROOT=SOPRA_ROOT,radius=8.0,truncation_ratio=0.0,radius_ratios=[1.0],
                  media="air,mgo,ag,mgo",broadening_par=0.0,broadening_perp=0.0,theta=45.0,phi=0.0,
                  energy_range=[1.5,5],pol='p',arrangement="Lattice",lattice_type="Square",
                  island_island="None",lattice_constant=20.0,multip_pos_rat=0.0,number_en_points=300,
@@ -164,10 +164,11 @@ class GranFilm:
 
         # Check for errors
         if (retcode != 0):
+            out,err = unicode(out, errors='replace'), unicode(err, errors='replace') # Is this needed ?
             print ('******STDOUT:******')
-            print (out.decode('utf-8'))
+            print (out)
             print ('******STDERR:******')
-            print (err.decode('utf-8'))
+            print (err)
             print ('*******************')
             print ('THERE WAS AN ERROR RUNNING GRANFILM')
             shutil.rmtree(tmpdir)
