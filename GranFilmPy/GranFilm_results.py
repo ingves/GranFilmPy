@@ -14,15 +14,11 @@ def GranFilm_Results(gf,data,data_RefTrans,data_Epsilon,data_Potential):
     import GranFilm_tools
 
     # Set the info attribute
-    gf["info"]        =  " Time of generation : %s " % GranFilm_tools.timestamp() 
-
-    # Units
-    gf["length_unit"] = "nano meters"   # Update this 
-    gf["energy_unit"] = "eV"            # Update this 
+    gf.info        =  " Time of generation : %s " % GranFilm_tools.timestamp() 
     
     # Set energy and wavelength
-    gf["energy"]     = data[:,0]
-    gf["wavelength"] = data[:,19]
+    gf.energy     = data[:,0]
+    gf.wavelength = data[:,19]
 
     # Fresnel coefficients
     gf["Fresnel"] = GranFilm_Results_Fresnel( data_RefTrans )
@@ -48,8 +44,55 @@ def GranFilm_Results(gf,data,data_RefTrans,data_Epsilon,data_Potential):
     # Potential
     if data_Potential is not None:
         gf["Potential"]  = GranFilm_Results_Potential(gf,data_Potential)
+    
+    # Reflectivity
+    gf.Reflectivity = GranFilm_Results_Reflectivity(gf,data_RefTrans)
 
     
+# --------------- Reflectivity --------------- #
+
+    
+class GranFilm_Results_Reflectivity:
+
+    def __init__(self,gf,data):
+        
+        # Imaginary unit
+        imu = 1j 
+        
+        # Defined angle
+        self.theta    = gf.param["theta"]
+                              
+        # Reflection amplitudes
+        self.rp       = data[:,1]  + imu * data[:,2]
+        self.rp_flat  = data[:,3]  + imu * data[:,4]
+        self.rs       = data[:,5]  + imu * data[:,6]
+        self.rs_flat  = data[:,7]  + imu * data[:,8]
+        self.rps      = np.sqrt((np.abs(self.rp)**2.0 + np.abs(self.rs)**2.0)/2)
+        self.rps_flat = np.sqrt((np.abs(self.rp_flat)**2.0 + np.abs(self.rs_flat)**2.0)/2)
+        
+        # Reflection coefficients for intensity
+        self.Rp       = np.abs(self.rp)**2.0
+        self.Rp_flat  = np.abs(self.rp_flat)**2.0
+        self.Rs       = np.abs(self.rs)**2.0
+        self.Rs_flat  = np.abs(self.rs_flat)**2.0
+        self.Rps      = self.rps**2.0
+        self.Rps_flat = self.rps_flat**2.0
+        
+        # Relative reflection coefficients for intensity
+        self.dRp      = (self.Rp - self.Rp_flat)/self.Rp_flat
+        self.dRs      = (self.Rs - self.Rs_flat)/self.Rs_flat
+        self.dRps     = (self.Rps - self.Rps_flat)/self.Rps_flat
+   
+    def __call__(self, pol, var='R'):
+        
+        if var == 'R0':
+            s = 'R'+pol+'_flat'
+        else:
+            s = var+pol
+        
+        return getattr(self,s)
+
+
 # --------------- Diff_Intensity_Coeff --------------- #
 
     
