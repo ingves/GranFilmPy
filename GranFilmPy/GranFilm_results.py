@@ -87,6 +87,8 @@ class GranFilm_Results_Reflectivity:
         
         if var == 'R0':
             s = 'R'+pol+'_flat'
+        elif var == 'dR_R':
+            s = 'dR'+pol
         else:
             s = var+pol
         
