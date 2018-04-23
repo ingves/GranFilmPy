@@ -8,44 +8,46 @@ python_interface = os.path.dirname(os.path.realpath(__file__)).replace('\\','/')
 class GranFilm_Parameters(dict):
 
 
-# --------------- Special methods --------------- #
+# --------------- Init method --------------- #
 
 
-    def __init__(self,param_dict,param_file):
+    def __init__(self,param_dict,potential_dict,param_file):
 
         # --- Initialisation of the gf.param dictionary
 
         if param_file is None: # Take the parameters from the param_dict
             
             self.update(param_dict)
-            
+            self.Potential = GranFilm_Parameters_Potential(potential_dict)
+        
         else: # Take parameters from the param_file and complain if the file is not correct
 
             self.update(param_dict)
-            self.File(param_file,'r')
-            
+            self.Potential = GranFilm_Parameters_Potential(potential_dict)
+            self.File(param_file,'r')            
                 
     def __getitem__(self,key):
 
         assert (key in self.keys()), "%s is not a valid parameter" % key # To make sure that only pre-defined keys can be get / set
-
         return self.get(key)
 
     def __setitem__(self,key,value):
 
         assert (key in self.keys()), "%s is not a valid parameter" % key
-
         dict.__setitem__(self,key,value)
         
-    def __str__(self,format="Python"):
+    def __str__(self,format="Default"):
         
-        if format == "Python":
+       
+        if format == "Default":
             
-            ret = "&Global \n"
-            ret += "  granfilm_root     = '{}' \n".format(self["granfilm_root"])
-            ret += "  sopra_root        = '{}' \n".format(self["sopra_root"])
+            ret = "\n----- Standard parameters -----\n\n"
+            
+            ret += "&Global \n"
+            ret += "  GRANFILM_ROOT     = '{}' \n".format(self["GRANFILM_ROOT"])
+            ret += "  SOPRA_ROOT        = '{}' \n".format(self["SOPRA_ROOT"])
             ret += "/\n\n"
-
+            
             ret += "&Source \n"
             ret += "  theta             = {} \n".format(self["theta"])
             ret += "  phi               = {} \n".format(self["phi"])
@@ -56,10 +58,8 @@ class GranFilm_Parameters(dict):
             ret += "&Geometry \n"
             ret += '  radius            = {} \n'.format(self["radius"])
             ret += '  truncation_ratio  = {} \n'.format(self["truncation_ratio"])
-            ret += '  broadening_par    = {} \n'.format(self["broadening_par"])
-            ret += '  broadening_perp   = {} \n'.format(self["broadening_perp"])
             ret += '  radius_ratios     = {} \n'.format(self["radius_ratios"])
-            ret += '  media             = "{}" \n'.format(self["media"])
+            ret += '  media             = {} \n'.format(self["media"])
             ret += "/\n\n"
 
             ret += "&Interaction \n"
@@ -68,36 +68,26 @@ class GranFilm_Parameters(dict):
             ret += "  island_island     = '{}' \n".format(self["island_island"])
             ret += "  lattice_constant  = {} \n".format(self["lattice_constant"])
             ret += "/\n\n"
-
-            ret += "&Curvefitting \n"
-            ret += "  lower_constraint  = {} \n".format(self["lower_constraint"])
-            ret += "  upper_constraint  = {} \n".format(self["upper_constraint"])
-            ret += "  sigma             = {} \n".format(self["sigma"])
-            ret += "  freeze_broadening = {} \n".format(self["freeze_broadening"])
-            ret += "/\n\n"
-
-            ret += "&Potential \n"
-            ret += "  points_file       = '{}' \n".format(self["points_file"])
-            ret += "  energy            = {} \n".format(self["energy"])
-            ret += "  area_ratio_pot    = {} \n".format(self["area_ratio_pot"])
-            ret += "  number_pot_points = {} \n".format(self["number_pot_points"])
-            ret += "/\n\n"
-
+            
             ret += "&Numerics \n"
             ret += "  multip_pos_rat    = {} \n".format(self["multip_pos_rat"])
             ret += "  number_en_points  = {} \n".format(self["number_en_points"])
             ret += "  multip_order      = {} \n".format(self["multip_order"])
             ret += "/\n\n"
+            
+            ret += "----- Parameters for potential calculation -----\n\n"
 
-            ret += "&Media \n"
-            ret += "  materials         = {} \n".format(self["materials"])
-            ret += "  extra_parameters  = {} \n".format(self["extra_parameters"])
-            ret += "/"
+            ret += "&Potential \n"
+            ret += "  points_file       = '{}' \n".format(self.Potential["points_file"])
+            ret += "  energy            = {} \n".format(self.Potential["energy"])
+            ret += "  area_ratio_pot    = {} \n".format(self.Potential["area_ratio_pot"])
+            ret += "  number_pot_points = {} \n".format(self.Potential["number_pot_points"])
+            ret += "/"            
 
-        else:
+        elif format == "Fortran":
             
             ret  = "&Global \n" # Global
-            ret += " SOPRA_ROOT = '%s' \n" % self["sopra_root"]
+            ret += " SOPRA_ROOT = '%s' \n" % self["SOPRA_ROOT"]
             ret += "/\n\n"
 
             ret += "&Source \n"
@@ -114,11 +104,10 @@ class GranFilm_Parameters(dict):
             except:
                 ret += '  Radius           = "{}" \n'.format(self["radius"])                
             ret += "  Truncation_Ratio = %f \n"      % self["truncation_ratio"]
-            ret += "  Broadening_Par   = %f \n"      % self["broadening_par"]
-            ret += "  Broadening_Perp  = %f \n"      % self["broadening_perp"]
+            
             # Change the radius_ratios into a string and remove potential brackets
             ret += '  Radius_Ratios    = "{}" \n'.format(str(self["radius_ratios"]).replace('[','').replace(']',''))                                                            
-            ret += '  Media            = "%s" \n'    % self["media"]
+            ret += '  Media            = "%s" \n'    % ','.join(self["media"]) # Convert the list of media into a string
             ret += "/\n\n"
 
             ret += "&Interaction \n" # Interaction
@@ -134,50 +123,41 @@ class GranFilm_Parameters(dict):
             ret += "  Multipole_Order           = %i \n"    % self["multip_order"]
             ret += "/\n\n"
 
-            ret += "&Curvefitting \n" # Curvefitting
-            ret += ("  Lower_Constraint = %s \n"   % 
-                            ', '.join([str(x) for x in self["lower_constraint"]]))
-            ret += ("  Upper_Constraint  = %s \n"  % 
-                            ', '.join([str(x) for x in self["upper_constraint"]]))
-            ret += "  sigma  = %f \n" % self["sigma"]
-            ret += "  freeze_broadening  = {} \n".format(self["freeze_broadening"])
-            ret += "/\n\n"
-
-            if self["points_file"] != "None": # Potential
+            if self.Potential["points_file"] != "None": # Potential
                 ret += "&Potential \n"
-                if self["points_file"] in ["classic","surface"]:
-                    ret += "  Points_File = '{}' \n".format(python_interface+'/'+self["points_file"])
+                if self.Potential["points_file"] in ["classic","surface"]:
+                    ret += "  Points_File = '{}' \n".format(python_interface+'/'+self.Potential["points_file"])
                 else:
-                    ret += "  Points_File = '%s' \n"   % os.path.abspath(self["points_file"])
-                ret += "  Energy = %s \n" % ', '.join([str(x) for x in self["energy"]])
+                    ret += "  Points_File = '%s' \n"   % os.path.abspath(self.Potential["points_file"])
+                ret += "  Energy = %s \n" % ', '.join([str(x) for x in self.Potential["energy"]])
                 ret += "/\n\n"
                 
-            for k in range(len(self["materials"])): # Materials
-                mat = self["materials"][k]
-                ret += "&%s \n"     % mat
-                try :
-                    ret += "  Material = \"%s\" \n"    % mat.lower()
-                except:
-                    ret += "  Material = \"%s\" \n"    % mat.toLower()
-                finally:
-                    for key in self["extra_parameters"][k].keys():
-                        if key == "Epsilon_Scale":
-                            ret += "  {} = {} \n".format(key,str(self["extra_parameters"][k][key]).replace('[','').replace(']',''))
-                        else:
-                            ret += "  {} = {} \n".format(key,self["extra_parameters"][k][key])
-            ret += "/\n\n"
-
+#            for mat in self["media"].split(','):
+#                ret += "&%s \n"     % mat
+#                try :
+#                    ret += "  Material = \"%s\" \n"    % mat.lower()
+#                except:
+#                    ret += "  Material = \"%s\" \n"    % mat.toLower()
+#                finally:
+#                    for key in self["extra_parameters"][k].keys():
+#                        if key == "Epsilon_Scale":
+#                            ret += "  {} = {} \n".format(key,str(self["extra_parameters"][k][key]).replace('[','').replace(']',''))
+#                        else:
+#                            ret += "  {} = {} \n".format(key,self["extra_parameters"][k][key])
+#            ret += "/\n\n"
+        else:
+            ret = "Wrong format for parameters printing. Try format = 'Default' or 'Fortran'."
         return ret
 
-    def __call__(self,format="Python"):
+    def __call__(self,format="Default"):
 
         print(self.__str__(format))
 
 
-# --------------- Other methods --------------- #
+# --------------- File method to read / write an external input file --------------- #
 
 
-    def File(self, fname, mode="None",format="Python"):
+    def File(self, fname, mode="None",format="Extended"):
         """
         Reads/Writes parameters to/from an external file that is in the sif-format. 
 
@@ -218,54 +198,69 @@ class GranFilm_Parameters(dict):
                         L2.append(s)
 
                 L3=[s.replace('\n','').replace(' ','').split('=') for s in L2] # remove blanks and split in (param,value)
-                D,param_dict = dict(L3),{}
-                keys = self.keys()
+                D = dict(L3)
+                param_keys = self.keys()
+                potential_keys = self.Potential.keys()
                 
                 for key in D.keys():
-                    if key in keys: # To only update existing parameters
-                        param_dict[key] = ast.literal_eval(D[key]) # turn "[1,2,3]" to [1,2,3] and is safe
+                    
+                    if key in param_keys: # To only update existing parameters
+                        self[key] = ast.literal_eval(D[key]) # turn "[1,2,3]" to [1,2,3] and is safe
+                    elif key in potential_keys:
+                        self.Potential[key] = ast.literal_eval(D[key])
                     else:
                         print("Warning: {} is not a valid parameter and will not be exported.\n".format(key))
-
-                self.update(param_dict)
                 
             except ValueError:
 
-                print("ERROR: The format of {} is not correct for the export of the parameters.\nGood format is: parameter=value\nParameters are unchanged.\n".format(fname))
+                print("""ERROR: The format of {} is not correct for the export of the parameters.\n
+                      The format is: parameter1=value1\nparameter2=value2\n...\n\n
+                      Parameters are unchanged.\n""".format(fname))
 
         else:
             print("ERROR: mode = {} must be 'w' or 'r'".format(mode))
 
 
-    def Epsilon(self,material):
+    def Material(self,material,x_axis="eV"):
         
-        path = self["sopra_root"] + material + ".nk"
+        path = self["SOPRA_ROOT"] + material + ".nk" # path to the .nk file of the medium
         
         try:
+            assert(x_axis in ['eV','microns']), "ERROR: x_axis = {} is not valid. Try x_axis = 'eV' or 'microns'".format(x_axis)
             with open(path,'r') as f:
-
-                s =[float(v) for v in f.readline().split()[1:]]
-                print("Energy_min = {}, Energy_max = {}".format(s[0],s[1]))
-                x = np.linspace(s[0],s[1],s[2]+1)
-                L = f.readlines()
-                
-            ref_index = []
-        
-            for line in L:
-                a = line.split()
-                ref_index.append(float(a[0])+1j*float(a[1]))
-
-            ref_index = np.array(ref_index,dtype=complex)
+                s = [ast.literal_eval(v) for v in f.readline().split()] # gets the format of the file (1 for eV, 2 for microns), the interval and the number of points
+                x = np.linspace(s[1],s[2],s[3]+1)               
+                y = []        
+                for k in range(s[3]+1):     # fills in list with values of the refractive index
+                    a = f.readline().split()
+                    y.append(float(a[0])+1j*float(a[1]))
+            
+            ref_index = np.array(y,dtype=complex)
             epsilon = ref_index**2
             
-            plt.subplot(211)
-            plt.plot(x,epsilon.real,label="Real")
+            if not((x_axis == 'microns' and s[0] == 2) or (x_axis == 'eV' and s[0] == 1)):
+                x = 1.24/x # if wrong unit for x, then convert x to eV or microns
+            
+            plt.subplot(121) # Plot of the dielectric function
+            plt.plot(x,epsilon.real,label="Real part")
             plt.title("Dielectric function of %s" %material)
+            plt.plot(x,epsilon.imag,label="Imag part")
+            if x_axis == "eV":
+                plt.xlabel("Energy (eV)")
+            else:
+                plt.xlabel("Wavelength (microns)")
             plt.legend()
-            plt.subplot(212)
-            plt.plot(x,epsilon.imag,label="Imag",color='r')
-            plt.xlabel("Energy (eV)")
+            
+            plt.subplot(122) # Plot of the refractive index
+            plt.plot(x,ref_index.real,label="Real part")
+            plt.title("Refractive index of %s" %material)
+            plt.plot(x,ref_index.imag,label="Imag part")
+            if x_axis == "eV":
+                plt.xlabel("Energy (eV)")
+            else:
+                plt.xlabel("Wavelength (microns)")
             plt.legend()
+            
             plt.show()
 
         except:
@@ -275,10 +270,10 @@ class GranFilm_Parameters(dict):
 
         # --- Initialisation of the input file for potential
 
-        n_pts = self["number_pot_points"] # number of points for the potential
-        area_ratio = self["area_ratio_pot"]
+        n_pts = self.Potential["number_pot_points"] # number of points for the potential
+        area_ratio = self.Potential["area_ratio_pot"]
         radius = self["radius"]
-        points_file = self["points_file"]
+        points_file = self.Potential["points_file"]
         
         try:
             x_radius = radius[0]
@@ -323,33 +318,27 @@ class GranFilm_Parameters(dict):
 
         elif (points_file != 'None') and (not os.path.isfile(points_file)): # points_file doesn't exist
 
-            print("points_file = %s does not exist.\nPotential will not be calculated (points_file = 'None')" % self["points_file"])
-            self["points_file"] = 'None'
+            print("points_file = %s does not exist.\nPotential will not be calculated (points_file = 'None')" % self.Potential["points_file"])
+            self.Potential["points_file"] = 'None'
+
+class GranFilm_Parameters_Potential(dict):
+    
+    """ 
+        Class which handle the parameters for the calculation of the potential.
+        Works like the GranFilm_Parameters class.
         
-##    def check_parameters(self):
-##
-##        assert(os.path.isfile(self["granfilm_root"])),"ERROR: The directory %s does not exist.\n" %self["granfilm_root"]
-##       
-##        assert(os.path.isdir(self["sopra_root"])),"ERROR: The file %s does not exist.\n" %self["sopra_root"]
-##       
-##        assert(0<=self["theta"]<90),"ERROR: theta = {} must satisfy 0 <= theta < 90 degrees.\n" %self["theta"]
-##       
-##        assert(self["pol"] in ['p','s']),"ERROR: polarization = {} must be 'p' or 's'.\n".format(self["pol"])
-##       
-##        L1,L2 = [],[]
-##        for mat in self["materials"]:
-##            path = self["sopra_root"]+mat+".nk"
-##            assert(os.path.isfile(path)),"ERROR: %s does not exist.\n" %path
-##            f = open(path,'r')
-##            s = f.readlines()[0].split()
-##            L1.append(s[1]) # min
-##            L2.append[s[2]) # max
-##
-##        energy_min,energy_max = max(L1),min(L2)        
-##        en_range = self["energy_range"]
-##        assert(energy_min<=en_range[0] and en_range[1]<=energy_max),"ERROR: energy_range = {} must be included in [{},{}].\n".format(en_range,energy_min,energy_max)
-##
-##        r = self["radius"]
-##        assert(0<r<=self["lattice_constant"]),"ERROR: radius = {} must satisfy 0 < radius <= lattice_constant = {}.\n".format(self["rad
-##
+    """
+    
+    def __init__(self,potential_dict):
         
+        self.update(potential_dict)
+        
+    def __getitem__(self,key):
+
+        assert (key in self.keys()), "%s is not a valid parameter" % key # To make sure that only pre-defined keys can be get / set
+        return self.get(key)
+
+    def __setitem__(self,key,value):
+
+        assert (key in self.keys()), "%s is not a valid parameter" % key
+        dict.__setitem__(self,key,value)

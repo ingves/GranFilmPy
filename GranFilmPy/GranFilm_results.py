@@ -20,35 +20,26 @@ def GranFilm_Results(gf,data,data_RefTrans,data_Epsilon,data_Potential):
     gf.energy     = data[:,0]
     gf.wavelength = data[:,19]
 
-    # Fresnel coefficients
-    gf["Fresnel"] = GranFilm_Results_Fresnel( data_RefTrans )
-
     # Epsilon
-    gf["epsilon"] = GranFilm_Results_Epsilon( data_Epsilon, gf )
+    gf.Epsilon = GranFilm_Results_Epsilon(data_Epsilon,gf)
 
     # Suceptibilities
-    gf["Susceptibilities"] =  GranFilm_Results_Suceptibilities( data )
+    gf.Susceptibilities =  GranFilm_Results_Suceptibilities(data)
 
     # Polarizabilities
-    gf["Polarizabilities"] =  GranFilm_Results_Polarizabilities( data )
-
-    # Intensity coefficients
-
-    gf["Intensity_coeff"] = GranFilm_Results_Intensity_Coeff(gf)
-
-    # Differential Intensity coefficients
-    media = gf.param["media"].split(',')
-    if media[0] != media[1]:
-        gf["Diff_intensity_coeff"]  = GranFilm_Results_Diff_Intensity_Coeff(gf)
-    
-    # Potential
-    if data_Potential is not None:
-        gf["Potential"]  = GranFilm_Results_Potential(gf,data_Potential)
+    gf.Polarizabilities =  GranFilm_Results_Polarizabilities(data)
     
     # Reflectivity
-    gf.Reflectivity = GranFilm_Results_Reflectivity(gf,data_RefTrans)
-
+    gf.Reflectivity2 = GranFilm_Results_Reflectivity(gf,data_RefTrans)
     
+    # Transmittance
+    gf.Transmittance2 = GranFilm_Results_Transmittance(gf,data_RefTrans)
+
+    # Potential
+    if data_Potential is not None:
+        gf.Potential = GranFilm_Results_Potential(gf,data_Potential)
+        
+        
 # --------------- Reflectivity --------------- #
 
     
@@ -56,32 +47,34 @@ class GranFilm_Results_Reflectivity:
 
     def __init__(self,gf,data):
         
-        # Imaginary unit
-        imu = 1j 
+        imu = 1j
         
-        # Defined angle
-        self.theta    = gf.param["theta"]
-                              
+        # Useful quantities
+        medium_1      = gf.param["media"][0]
+        medium_2      = gf.param["media"][1]
+        n1,n2         = np.sqrt(gf.Epsilon[medium_1]),np.sqrt(gf.Epsilon[medium_2])
+        theta_1       = gf.param["theta"]*np.pi/180.0
+                             
         # Reflection amplitudes
         self.rp       = data[:,1]  + imu * data[:,2]
         self.rp_flat  = data[:,3]  + imu * data[:,4]
         self.rs       = data[:,5]  + imu * data[:,6]
         self.rs_flat  = data[:,7]  + imu * data[:,8]
-        self.rps      = np.sqrt((np.abs(self.rp)**2.0 + np.abs(self.rs)**2.0)/2)
-        self.rps_flat = np.sqrt((np.abs(self.rp_flat)**2.0 + np.abs(self.rs_flat)**2.0)/2)
+        self.rps      = np.sqrt(()
         
         # Reflection coefficients for intensity
         self.Rp       = np.abs(self.rp)**2.0
         self.Rp_flat  = np.abs(self.rp_flat)**2.0
         self.Rs       = np.abs(self.rs)**2.0
         self.Rs_flat  = np.abs(self.rs_flat)**2.0
-        self.Rps      = self.rps**2.0
-        self.Rps_flat = self.rps_flat**2.0
+        self.Rps      = (np.abs(self.rp)**2.0 + np.abs(self.rs)**2.0))/2
+        self.Rps_flat = (np.abs(self.rp)**2.0 + np.abs(self.rs)**2.0)/2
         
         # Relative reflection coefficients for intensity
-        self.dRp      = (self.Rp - self.Rp_flat)/self.Rp_flat
-        self.dRs      = (self.Rs - self.Rs_flat)/self.Rs_flat
-        self.dRps     = (self.Rps - self.Rps_flat)/self.Rps_flat
+        if gf.param["media"][0] != gf.param["media"][1]:
+            self.dRp  = (self.Rp - self.Rp_flat)/self.Rp_flat
+            self.dRs  = (self.Rs - self.Rs_flat)/self.Rs_flat
+            self.dRps = (self.Rps - self.Rps_flat)/self.Rps_flat
    
     def __call__(self, pol, var='R'):
         
@@ -91,203 +84,52 @@ class GranFilm_Results_Reflectivity:
             s = 'dR'+pol
         else:
             s = var+pol
-        
+            
+        assert (hasattr(self,s)), "ERROR : var={} and pol={} are not valid arguments".format(var,pol)
         return getattr(self,s)
 
 
-# --------------- Diff_Intensity_Coeff --------------- #
+# --------------- Transmittance --------------- #
 
     
-class GranFilm_Results_Diff_Intensity_Coeff:
+class GranFilm_Results_Transmittance:
 
-    def __init__(self,gf):
-
-        I_coeff = gf["Intensity_coeff"]
+    def __init__(self,gf,data):
         
-        self.dRp_Rp   = (I_coeff('R','p') - I_coeff('R','p','Flat'))/I_coeff('R','p','Flat')
-        self.dRs_Rs   = (I_coeff('R','s') - I_coeff('R','s','Flat'))/I_coeff('R','s','Flat')
-        self.dRps_Rps = (I_coeff('R','ps') - I_coeff('R','ps','Flat'))/I_coeff('R','ps','Flat')
-
-        self.dTp_Tp   = (I_coeff('T','p') - I_coeff('T','p','Flat'))/I_coeff('T','p','Flat')
-        self.dTs_Ts   = (I_coeff('T','s') - I_coeff('T','s','Flat'))/I_coeff('T','s','Flat')
-        self.dTps_Tps = (I_coeff('T','ps') - I_coeff('T','ps','Flat'))/I_coeff('T','ps','Flat')
-
-        self.dAp_Ap   = (I_coeff('A','p') - I_coeff('A','p','Flat'))/I_coeff('A','p','Flat')
-        self.dAs_As   = (I_coeff('A','s') - I_coeff('A','s','Flat'))/I_coeff('A','s','Flat')
-        self.dAps_Aps = (I_coeff('A','ps') - I_coeff('A','ps','Flat'))/I_coeff('A','ps','Flat')
-
-
-    def __call__(self,ref_trans,pol):
+        # Imaginary unit
+        imu = 1j 
+                              
+        # Tranmission amplitudes
+        self.tp       = data[:,9]  + imu * data[:,10]
+        self.tp_flat  = data[:,11] + imu * data[:,12]
+        self.ts       = data[:,13] + imu * data[:,14]
+        self.ts_flat  = data[:,15] + imu * data[:,16]
         
-        # --- some assertions
-        assert (ref_trans in {'R','T'}), "ERROR : Unsupported coefficient -> Valid options: 'R' , 'T'"
-        assert (pol in {'p','s','ps'}), "ERROR : Unsupported polarisation -> Valid options: 'p' , 's' , 'ps'"
-        
-        return getattr(self,'d'+ref_trans+pol+'_'+ref_trans+pol)
-
-
-# --------------- Intensity_Coeff --------------- #
-
-    
-class GranFilm_Results_Intensity_Coeff:
-    
-
-    def __init__(self,gf):
-
-        fresnel = gf["Fresnel"]
-        theta = gf.param["theta"]*np.pi/180.0
-        media=gf.param["media"].split(',')
-        eps_air = gf["epsilon"](media[0])
-        eps_substrate = gf["epsilon"](media[1])
-
-        # ----- Reflection ----- #
-        rp=fresnel('r','p')
-        rp_flat=fresnel('r','p','Flat')
-        rs=fresnel('r','s')
-        rs_flat=fresnel('r','s','Flat')
-
-        self.Rp = np.abs(rp)**2.0
-        self.Rp_flat = np.abs(rp_flat)**2.0
-        self.Rs = np.abs(rs)**2.0
-        self.Rs_flat = np.abs(rs_flat)**2.0
-        self.Rps = (self.Rp + self.Rs)/2.0
-        self.Rps_flat = (self.Rp_flat + self.Rs_flat)/2.0
-        
-        # ----- Transmission ----- #
-        tp=fresnel('t','p')
-        tp_flat=fresnel('t','p','Flat')
-        ts=fresnel('t','s')
-        ts_flat=fresnel('t','s','Flat')
-        e = np.abs((eps_substrate/eps_air)**0.5)
-        a = np.cos(np.arcsin(np.sin(theta)/e))/np.cos(theta)
-        self.Tp = e*a*np.abs(tp)**2.0
-        self.Tp_flat = np.abs(tp_flat)**2.0
-        self.Ts = e*a*np.abs(ts)**2.0
-        self.Ts_flat = np.abs(ts_flat)**2.0
-        self.Tps = (self.Tp + self.Ts)/2.0
+        # Transmission coefficients for intensity
+        self.Tp       = np.abs(n2/n1)*(c2/c1)*np.abs(self.tp)**2.0
+        self.Tp_flat  = np.abs(n2/n1)*(c2/c1)*np.abs(self.tp_flat)**2.0
+        self.Ts       = np.abs(n2/n1)*(c2/c1)*np.abs(self.ts)**2.0
+        self.Ts_flat  = np.abs(n2/n1)*(c2/c1)*np.abs(self.ts_flat)**2.0
+        self.Tps      = (self.Tp + self.Ts)/2.0
         self.Tps_flat = (self.Tp_flat + self.Ts_flat)/2.0
-
-        # ----- Absorption ----- #
-        self.Ap = 1-self.Rp-self.Tp
-        self.Ap_flat = 1-self.Rp_flat-self.Tp_flat
-        self.As = 1-self.Rs-self.Ts
-        self.As_flat = 1-self.Rs_flat-self.Ts_flat
-        self.Aps = 1-self.Rps-self.Tps
-        self.Aps_flat = 1-self.Rps_flat-self.Tps_flat
         
-
-    def __call__(self,ref_trans,pol,geometry='Island'):
-
-        # --- some assertions
-        assert (ref_trans in {'A','R','T'}), "ERROR : Unsupported coefficient -> Valid options: 'R' , 'T'"
-        assert (pol in {'p','s','ps'}), "ERROR : Unsupported polarisation -> Valid options: 'p' , 's' , 'ps'"  
-        assert (geometry in {'Island','Flat'}), "ERROR : Unsupported geometry -> Valid options: 'Island' , 'Flat'"
-
-        if geometry=='Island':
-            return getattr(self,ref_trans+pol)
+        # Relative transmission coefficients for intensity
+        if gf.param["media"][0] != gf.param["media"][1]:
+            self.dTp  = (self.Tp - self.Tp_flat)/self.Tp_flat
+            self.dTs  = (self.Ts - self.Ts_flat)/self.Ts_flat
+            self.dTps = (self.Tps - self.Tps_flat)/self.Tps_flat
+   
+    def __call__(self, pol, var='T'):
+        
+        if var == 'T0':
+            s = 'T'+pol+'_flat'
+        elif var == 'dT_T':
+            s = 'dR'+pol
         else:
-            return getattr(self,ref_trans+pol+'_flat')
-
-
-# --------------- Fresnel_Coeff --------------- #
-
-
-class GranFilm_Results_Fresnel:
-    
-    """
-    Class for populating the data container
-
-    Attributes:
-
-    Methods:
-        None at this point.
-  
-    Use:
-        Call the class to read data
-
-    """
-    
-    def __init__(self, data):
-        
-        imu = 1j                         # imaginar unit
-        #
-        self.energy = data[:,0]
-        # reflction amplitudes
-        self.r_p       = data[:,1]  + imu * data[:,2]
-        self.r_p_flat  = data[:,3]  + imu * data[:,4]
-        self.r_s       = data[:,5]  + imu * data[:,6]
-        self.r_s_flat  = data[:,7]  + imu * data[:,8]
-        # transmission amplitudes
-        self.t_p       = data[:,9]  + imu * data[:,10]
-        self.t_p_flat  = data[:,11] + imu * data[:,12]
-        self.t_s       = data[:,13] + imu * data[:,14]
-        self.t_s_flat  = data[:,15] + imu * data[:,16]
-        
-
-    def __call__(self,ref_trans,polarization,geometry="Island",fmt="Complex",deg="True"): 
-
-        """
-        Gets the fresnel amplitude for reflection or transmission for a given linear polarization 
-        of the incident light           
-
-        Options
-        -------
-        ref_trans : string
-            Reflection ('r') or transmission ('t') amplitudes
-        polarization : string
-            P-polarization ('p') or s-polarization ('s') of the incident light.
-            If polarization='ps' the sum of p and s-polarization is returned
-        geometry : string
-            By default ('Island'), the amplitude for the supported granular system is returned.
-            If geometry="Flat", the classic Fresnel amplitudes for the corresponding flat geometry is returned. 
-        
-        """
-        
-        # --- some assertions
-        assert (ref_trans in {'r','t'}), "ERROR : Unsupported coefficient -> Valid options: 'R' , 'T'"
-        assert (polarization in {'p','s','ps'}), "ERROR : Unsupported polarization -> Valid options: 'p' , 's' , 'ps'"  
-        assert (geometry in {'Island','Flat'}), "ERROR : Unsupported geometry -> Valid options: 'Island' , 'Flat'"
-
-
-        # ----- Reflection ----- #
-        
-        if (ref_trans=="r"):
-            # Initial value
-            Fresnel_Amplitude = 0.   
-            # --- p-polarization
-            if (polarization in {'ps','p'}):
-                if (geometry=="Flat"):
-                    Fresnel_Amplitude =+  self.r_p_flat
-                else:
-                    Fresnel_Amplitude =+  self.r_p
-            # --- s-polarization
-            if (polarization in {'ps','s'}):
-                if (geometry=="Flat"):
-                    Fresnel_Amplitude =+  self.r_s_flat
-                else:
-                    Fresnel_Amplitude =+  self.r_s
-            # Return result
-            return reformat(Fresnel_Amplitude,fmt=fmt,deg=deg)
-        
-        # ----- Transmission ----- #
-        
-        if (ref_trans=="t"):
-            # Initial value
-            Fresnel_Amplitude = 0.   
-            # --- p-polarization
-            if (polarization in {'ps','p'}):
-                if (geometry=="Flat"):
-                    Fresnel_Amplitude =+  self.t_p_flat
-                else:
-                    Fresnel_Amplitude =+  self.t_p
-            # --- s-polarization
-            if (polarization in {'ps','s'}):
-                if (geometry=="Flat"):
-                    Fresnel_Amplitude =+  self.t_s_flat
-                else:
-                    Fresnel_Amplitude =+  self.t_s
-            # Return result
-            return Fresnel_Amplitude
+            s = var+pol
+            
+        assert (hasattr(self,s)), "ERROR : var={} and pol={} are not valid arguments".format(var,pol)
+        return getattr(self,s)
 
 
 # --------------- Susceptibilities --------------- #
@@ -339,7 +181,7 @@ class GranFilm_Results_Suceptibilities:
 
         # error checking
         FMT={'Complex', 'Real', 'Imag', 'Amplitude', 'Phase' }
-        assert (type in {'gamma','beta', 'delta', 'tau'}), "ERROR : type=%s is not supported (valid options: 'Dipole','Quadrupole') " % type        
+        assert (type in {'gamma','beta', 'delta', 'tau'}), "ERROR : type=%s is not supported (valid options: 'gamma','beta','delta','tau') " % type        
         assert (fmt in FMT), "ERROR : type=%s is not supported " % fmt
 
         if (type=='gamma'):
@@ -456,7 +298,7 @@ class GranFilm_Results_Epsilon(dict):
 
         # --- loop over materials
         i=-1
-        for material in gf.param["media"].split(','):
+        for material in gf.param["media"]:
             i += 2
             self[material] = data[:,i]  + imu * data[:,i+1]
 
@@ -484,18 +326,18 @@ class GranFilm_Results_Potential():
     def __init__(self,gf,data_Potential):
 
         self.data = data_Potential
-        self.points_file = gf.param["points_file"]
+        self.points_file = gf.param.Potential["points_file"]
         
         if self.points_file == "classic":
             
             x_border = self.data[0][0] # -area_ratio * x_radius
             y_border = self.data[0][2] # -area_ratio * y_radius
-            self.x_radius = x_border/-gf.param["area_ratio_pot"]
-            self.y_radius = y_border/-gf.param["area_ratio_pot"]
+            self.x_radius = x_border/-gf.param.Potential["area_ratio_pot"]
+            self.y_radius = y_border/-gf.param.Potential["area_ratio_pot"]
             self.area = (x_border,-x_border,-y_border,y_border)
             self.truncation_ratio = gf.param["truncation_ratio"]
             self.interface_level = self.truncation_ratio*self.y_radius
-            self.media = gf.param["media"].split(',')
+            self.media = gf.param["media"]
             self.radius_ratios = gf.param["radius_ratios"]
 
             # Reshapment of the data to create the "map" with the values of the potential
@@ -509,6 +351,10 @@ class GranFilm_Results_Potential():
                     P[k,i]=self.data[i*p+k][4]+1j*self.data[i*p+k][5]
                     
             self.potential = P
+            
+            x = np.linspace(x_border,-x_border,p)
+            y = np.linspace(y_border,-y_border,p)
+            self.X,self.Y = np.meshgrid(x,y)
 
         elif self.points_file == "surface":
             
@@ -521,7 +367,7 @@ class GranFilm_Results_Potential():
             self.error = 2*s/n
             
         
-    def __call__(self,output='plot',fmt="Real",deg='True',equipotential=False):
+    def __call__(self,output='plot',fmt="Real",deg='True',equipotential=True,lines=10,linewidths=1):
 
         
         if output=='plot': # Plot the potential
@@ -566,16 +412,11 @@ class GranFilm_Results_Potential():
             if p>-1:
                 ax.text(0,(B[p][0]+self.interface_level)/2.0,B[p][1],clip_on=True)
 
-            min_pot = formated_potential.min()
-            max_pot = formated_potential.max()
             p = formated_potential.shape[0]/2.0
 
             if equipotential == True:
-                for v in np.linspace(min_pot,max_pot,10):
-                    contours = measure.find_contours(formated_potential, v)
-                    for n, contour in enumerate(contours):
-                        len_contour = len(contour[:,0])
-                        ax.plot((contour[:, 1]-p)*x_max/p, (contour[:, 0]-p)*y_max/p, linewidth=1.0,color='k')
+                cs = plt.contour(self.X,self.Y,formated_potential,lines,linewidths=linewidths)
+                plt.clabel(cs,fontsize=0,inline=0)
                                             
             plt.xlim([-x_max,x_max])
             plt.ylim([-y_max,y_max])
